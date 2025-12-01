@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Abu Tayef!</title>
+    <!-- CDN Links -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-primary: #ff5ca2;
+            --color-secondary: #9b59b6;
+            --color-accent: #3498db;
+            --color-highlight: #f1c40f;
+            --color-bg: #0c0a09;
+            --color-card-bg: rgba(20, 20, 30, 0.7);
+            --color-text: #f8f8f8;
+            --color-text-light: #cccccc;
+        }
+        
+        body {
+            font-family: 'Satoshi', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Aurora Background */
+        #aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .aurora-layer {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(60px);
+            animation: aurora-move 25s infinite alternate ease-in-out;
+        }
+        
+        .layer-1 {
+            background: radial-gradient(circle, var(--color-primary) 0%, transparent 70%);
+            animation-delay: 0s;
+        }
+        
+        .layer-2 {
+            background: radial-gradient(circle, var(--color-secondary) 0%, transparent 70%);
+            animation-delay: 5s;
+        }
+        
+        .layer-3 {
+            background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+            animation-delay: 10s;
+        }
+        
+        .layer-4 {
+            background: radial-gradient(circle, var(--color-highlight) 0%, transparent 70%);
+            animation-delay: 15s;
+        }
+        
+        /* 3D Hearts Container */
+        #hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            padding: 0 2rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            max-width: 600px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* Steps Container */
+        .steps-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 120px 0 80px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .step {
+            display: none;
+            max-width: 800px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .step.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--color-card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2),
+                        0 0 0 1px rgba(255, 255, 255, 0.05),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3),
+                        0 0 0 1px rgba(255, 255, 255, 0.1),
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Typography */
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-highlight));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+        }
+        
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--color-text-light);
+            margin-bottom: 2rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(255, 92, 162, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 92, 162, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+        }
+        
+        .btn:hover::after {
+            animation: shimmer 1.5s infinite;
+        }
+        
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .bento-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .bento-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bento-item-large {
+            grid-column: span 2;
+        }
+        
+        .bento-item h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-primary);
+        }
+        
+        /* Polaroid */
+        .polaroid {
+            width: 300px;
+            height: 350px;
+            background: white;
+            padding: 15px 15px 60px;
+            margin: 2rem auto;
+            transform: rotate(2deg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .polaroid-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .polaroid-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        /* Emojis */
+        .emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 4s infinite ease-in-out;
+        }
+        
+        .emoji-heart {
+            animation: pulse 2s infinite;
+        }
+        
+        .emoji-party {
+            animation: shake 1.5s infinite;
+        }
+        
+        .emoji-cake {
+            animation: bounce 3s infinite;
+        }
+        
+        /* Final Text */
+        .final-text {
+            font-size: 4rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            text-align: center;
+            margin: 3rem 0;
+            opacity: 0;
+            transform: translateY(50px);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-highlight), var(--color-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Music Toggle */
+        .music-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .music-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255, 92, 162, 0.2);
+        }
+        
+        .music-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--color-primary);
+        }
+        
+        /* Photo Gallery */
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .photo-item {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .photo-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Animations */
+        @keyframes aurora-move {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(5%, 5%) rotate(5deg); }
+            50% { transform: translate(10%, 0) rotate(10deg); }
+            75% { transform: translate(5%, -5%) rotate(5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            
+            .glass-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bento-item-large {
+                grid-column: span 1;
+            }
+            
+            .polaroid {
+                width: 250px;
+                height: 300px;
+            }
+            
+            .final-text {
+                font-size: 2.5rem;
+            }
+            
+            .photo-item {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .progress-container {
+                padding: 0 1rem;
+            }
+            
+            .photo-item {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div id="aurora-bg">
+        <div class="aurora-layer layer-1"></div>
+        <div class="aurora-layer layer-2"></div>
+        <div class="aurora-layer layer-3"></div>
+        <div class="aurora-layer layer-4"></div>
+    </div>
+    
+    <!-- 3D Hearts Container -->
+    <div id="hearts-container"></div>
+    
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+    
+    <!-- Steps Container -->
+    <div class="container">
+        <div class="steps-container">
+            <!-- Step 1: Grand Welcome -->
+            <div class="step active" id="step1">
+                <div class="glass-card text-center">
+                    <div class="emoji emoji-heart">❤️</div>
+                    <h1>Hey Abu Tayef,</h1>
+                    <p>I built a little world for you, just to bring a smile to your face on your special day. Today is all about celebrating you and the amazing person you are.</p>
+                    <button class="btn" onclick="nextStep()">Let's Begin</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: The Core Message -->
+            <div class="step" id="step2">
+                <div class="glass-card text-center">
+                    <div class="emoji emoji-party">🎉</div>
+                    <h1>Happy Birthday!</h1>
+                    <p>Another year of you making the world brighter. Your existence is a gift, and I'm so lucky to witness it. Your kindness, strength, and beautiful soul inspire everyone around you.</p>
+                    
+                    <!-- Photo Gallery -->
+                    <div class="photo-gallery">
+                        <div class="photo-item">
+                            <img src="https://uploads.onecompiler.io/44638bvqy/445ws5x27/IMG-20251201-WA0016.jpg" alt="Abu Tayef">
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://uploads.onecompiler.io/44638bvqy/445ws5x27/IMG-20251201-WA0017.jpg" alt="Abu Tayef">
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://uploads.onecompiler.io/44638bvqy/445ws5x27/IMG-20251201-WA0007.jpg" alt="Abu Tayef">
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="nextStep()">There's more...</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: The Reasons Why -->
+            <div class="step" id="step3">
+                <div class="glass-card">
+                    <h2 class="text-center">A Few Things I Adore About You</h2>
+                    
+                    <div class="bento-grid">
+                        <div class="bento-item bento-item-large">
+                            <h3>✨ Your Unmatched Kindness</h3>
+                            <p>The genuine warmth you show to everyone is truly rare and beautiful. You have this incredible ability to make people feel seen, heard, and valued.</p>
+                        </div>
+                        
+                        <div class="bento-item">
+                            <h3>😊 That Smile</h3>
+                            <p>It's a work of art that lights up any room. Your smile has this contagious quality that instantly lifts everyone's spirits.</p>
+                        </div>
+                        
+                        <div class="bento-item">
+                            <h3>💪 Your Strength</h3>
+                            <p>The resilience you show in facing challenges is truly inspiring. You handle everything with such grace and determination.</p>
+                        </div>
+                        
+                        <div class="bento-item bento-item-large">
+                            <h3>🌟 Your Radiant Spirit</h3>
+                            <p>Your passion for life is infectious. Being around you makes everything exciting and possible. You have this unique energy that transforms ordinary moments into magical ones.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-8">
+                        <button class="btn" onclick="nextStep()">Remember this?</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Shared Memory -->
+            <div class="step" id="step4">
+                <div class="glass-card text-center">
+                    <h2>That One Time…</h2>
+                    
+                    <div class="polaroid" id="polaroid">
+                        <div class="polaroid-image" style="background-image: url('https://uploads.onecompiler.io/44638bvqy/445ws5x27/IMG-20251201-WA0015.jpg');"></div>
+                        <div class="polaroid-caption">Our favorite memory</div>
+                    </div>
+                    
+                    <div class="photo-gallery">
+                        <div class="photo-item">
+                            <img src="https://uploads.onecompiler.io/44638bvqy/445ws5x27/IMG-20251201-WA0013.jpg" alt="Abu Tayef">
+                        </div>
+                    </div>
+                    
+                    <p>Every moment with you feels like a scene from a movie I'd watch on repeat. Whether we're laughing until our sides hurt or sharing quiet, meaningful conversations, each memory with you is a treasure I hold close to my heart.</p>
+                    
+                    <button class="btn" onclick="nextStep()">One last thing...</button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Birthday Wish & Finale -->
+            <div class="step" id="step5">
+                <div class="glass-card text-center">
+                    <div class="emoji emoji-cake">🎂</div>
+                    <h2>My Wish For You</h2>
+                    <p>May your life be filled with peace, success, and countless blessings. Wishing you a year of growth, joy, and unforgettable moments. May all your dreams take flight and may you continue to shine brighter with each passing day.</p>
+                    
+                    <div class="text-center mt-8">
+                        <button class="btn" id="celebrate-btn" onclick="startCelebration()">Celebrate!</button>
+                    </div>
+                    
+                    <div class="final-text" id="final-text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Music Toggle -->
+    <div class="music-toggle" id="music-toggle">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+    </div>
+    
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999;"></canvas>
+    
+    <script>
+        // Current step tracking
+        let currentStep = 1;
+        const totalSteps = 5;
+        let threeScene, camera, renderer, hearts = [];
+        let isMusicPlaying = false;
+        let audioContext, audioBuffer, sourceNode, gainNode;
+        
+        // Initialize the experience
+        document.addEventListener('DOMContentLoaded', function() {
+            initAurora();
+            initThreeJS();
+            initPolaroid();
+            initMusicToggle();
+            updateProgressBar();
+            
+            // Animate step 1 entrance
+            gsap.fromTo('#step1', 
+                { opacity: 0, y: 50 },
+                { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }
+            );
+        });
+        
+        // Initialize Aurora Background
+        function initAurora() {
+            const auroraLayers = document.querySelectorAll('.aurora-layer');
+            auroraLayers.forEach((layer, index) => {
+                gsap.to(layer, {
+                    duration: 30 + index * 5,
+                    x: 'random(-10%, 10%)',
+                    y: 'random(-10%, 10%)',
+                    rotation: 'random(-10, 10)',
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut'
+                });
+            });
+        }
+        
+        // Initialize Three.js 3D Hearts
+        function initThreeJS() {
+            const container = document.getElementById('hearts-container');
+            
+            // Create scene
+            threeScene = new THREE.Scene();
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+            
+            // Create hearts
+            const heartGeometry = createHeartGeometry();
+            const heartMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xff5ca2,
+                emissive: 0xff5ca2,
+                emissiveIntensity: 0.2,
+                roughness: 0.1,
+                metalness: 0.8
+            });
+            
+            // Create 20-25 hearts
+            for (let i = 0; i < 25; i++) {
+                const heart = new THREE.Mesh(heartGeometry, heartMaterial.clone());
+                
+                // Random position
+                heart.position.x = (Math.random() - 0.5) * 20;
+                heart.position.y = (Math.random() - 0.5) * 15;
+                heart.position.z = (Math.random() - 0.5) * 10;
+                
+                // Random size
+                const scale = 0.1 + Math.random() * 0.15;
+                heart.scale.set(scale, scale, scale);
+                
+                // Store initial values for animation
+                heart.userData = {
+                    speed: 0.5 + Math.random() * 0.5,
+                    rotationSpeed: (Math.random() - 0.5) * 0.02,
+                    amplitude: 0.5 + Math.random() * 0.5,
+                    initialY: heart.position.y,
+                    hoverIntensity: 0
+                };
+                
+                threeScene.add(heart);
+                hearts.push(heart);
+            }
+            
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            threeScene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 5, 5);
+            threeScene.add(directionalLight);
+            
+            // Add a point light for glow effect
+            const pointLight = new THREE.PointLight(0xff5ca2, 0.5, 50);
+            pointLight.position.set(0, 0, 5);
+            threeScene.add(pointLight);
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Handle mouse movement for interaction
+            document.addEventListener('mousemove', onMouseMove);
+            
+            // Start animation
+            animateHearts();
+        }
+        
+        // Create heart geometry
+        function createHeartGeometry() {
+            const shape = new THREE.Shape();
+            
+            // Heart shape coordinates
+            shape.moveTo(0, 0.25);
+            shape.bezierCurveTo(0, 0.25, 0.1, 0, 0.25, 0);
+            shape.bezierCurveTo(0.5, 0, 0.5, 0.25, 0.5, 0.25);
+            shape.bezierCurveTo(0.5, 0.25, 0.5, 0, 0.75, 0);
+            shape.bezierCurveTo(1, 0, 1, 0.25, 1, 0.25);
+            shape.bezierCurveTo(1, 0.5, 0.75, 0.75, 0.5, 1);
+            shape.bezierCurveTo(0.25, 0.75, 0, 0.5, 0, 0.25);
+            
+            const extrudeSettings = {
+                depth: 0.1,
+                bevelEnabled: true,
+                bevelSegments: 2,
+                steps: 2,
+                bevelSize: 0.02,
+                bevelThickness: 0.02
+            };
+            
+            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        }
+        
+        // Animate hearts
+        function animateHearts() {
+            requestAnimationFrame(animateHearts);
+            
+            const time = Date.now() * 0.001;
+            
+            hearts.forEach(heart => {
+                // Floating motion
+                heart.position.y = heart.userData.initialY + Math.sin(time * heart.userData.speed) * heart.userData.amplitude;
+                
+                // Rotation
+                heart.rotation.x += heart.userData.rotationSpeed;
+                heart.rotation.y += heart.userData.rotationSpeed;
+                
+                // Hover effect
+                if (heart.userData.hoverIntensity > 0) {
+                    heart.scale.x = heart.scale.y = heart.scale.z = 0.15 + heart.userData.hoverIntensity * 0.05;
+                    heart.userData.hoverIntensity *= 0.9; // Fade out effect
+                }
+            });
+            
+            renderer.render(threeScene, camera);
+        }
+        
+        // Handle mouse movement for heart interaction
+        function onMouseMove(event) {
+            // Convert mouse position to normalized device coordinates
+            const mouse = {
+                x: (event.clientX / window.innerWidth) * 2 - 1,
+                y: -(event.clientY / window.innerHeight) * 2 + 1
+            };
+            
+            // Update heart hover intensity based on mouse position
+            hearts.forEach(heart => {
+                const heartScreenPos = new THREE.Vector3();
+                heart.getWorldPosition(heartScreenPos);
+                heartScreenPos.project(camera);
+                
+                const distance = Math.sqrt(
+                    Math.pow(mouse.x - heartScreenPos.x, 2) + 
+                    Math.pow(mouse.y - heartScreenPos.y, 2)
+                );
+                
+                if (distance < 0.2) {
+                    heart.userData.hoverIntensity = Math.max(heart.userData.hoverIntensity, 0.5);
+                }
+            });
+        }
+        
+        // Handle window resize
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Initialize polaroid hover effect
+        function initPolaroid() {
+            const polaroid = document.getElementById('polaroid');
+            
+            polaroid.addEventListener('mousemove', function(e) {
+                const rect = polaroid.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateY = (x - centerX) / 25;
+                const rotateX = (centerY - y) / 25;
+                
+                polaroid.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            });
+            
+            polaroid.addEventListener('mouseleave', function() {
+                polaroid.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        }
+        
+        // Initialize music toggle
+        function initMusicToggle() {
+            const toggle = document.getElementById('music-toggle');
+            
+            // Create audio context on user interaction
+            toggle.addEventListener('click', function() {
+                if (!audioContext) {
+                    initAudio();
+                } else {
+                    toggleMusic();
+                }
+            });
+        }
+        
+        // Initialize audio
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            gainNode = audioContext.createGain();
+            gainNode.connect(audioContext.destination);
+            
+            // Create a simple birthday melody using Web Audio API
+            createBirthdayMelody();
+            
+            // Update UI
+            document.getElementById('music-toggle').style.background = 'rgba(255, 92, 162, 0.3)';
+            isMusicPlaying = true;
+        }
+        
+        // Create a simple birthday melody
+        function createBirthdayMelody() {
+            // Create oscillator for melody
+            const oscillator = audioContext.createOscillator();
+            oscillator.connect(gainNode);
+            oscillator.type = 'sine';
+            
+            // Birthday song notes (simplified)
+            const notes = [
+                { freq: 523.25, duration: 0.3 }, // C5
+                { freq: 523.25, duration: 0.3 }, // C5
+                { freq: 587.33, duration: 0.6 }, // D5
+                { freq: 523.25, duration: 0.6 }, // C5
+                { freq: 698.46, duration: 0.6 }, // F5
+                { freq: 659.25, duration: 0.9 }, // E5
+                
+                { freq: 523.25, duration: 0.3 }, // C5
+                { freq: 523.25, duration: 0.3 }, // C5
+                { freq: 587.33, duration: 0.6 }, // D5
+                { freq: 523.25, duration: 0.6 }, // C5
+                { freq: 783.99, duration: 0.6 }, // G5
+                { freq: 698.46, duration: 0.9 }, // F5
+                
+                { freq: 523.25, duration: 0.3 }, // C5
+                { freq: 523.25, duration: 0.3 }, // C5
+                { freq: 1046.50, duration: 0.6 }, // C6
+                { freq: 880.00, duration: 0.6 }, // A5
+                { freq: 698.46, duration: 0.6 }, // F5
+                { freq: 659.25, duration: 0.6 }, // E5
+                { freq: 587.33, duration: 0.9 }, // D5
+                
+                { freq: 987.77, duration: 0.3 }, // B5
+                { freq: 987.77, duration: 0.3 }, // B5
+                { freq: 880.00, duration: 0.6 }, // A5
+                { freq: 698.46, duration: 0.6 }, // F5
+                { freq: 783.99, duration: 0.6 }, // G5
+                { freq: 698.46, duration: 1.2 }  // F5
+            ];
+            
+            // Schedule notes
+            let time = audioContext.currentTime + 0.1;
+            
+            oscillator.frequency.setValueAtTime(notes[0].freq, time);
+            oscillator.start(time);
+            
+            notes.forEach((note, index) => {
+                oscillator.frequency.setValueAtTime(note.freq, time);
+                time += note.duration;
+                
+                if (index === notes.length - 1) {
+                    oscillator.stop(time);
+                }
+            });
+            
+            // Loop the melody
+            oscillator.onended = function() {
+                if (isMusicPlaying) {
+                    setTimeout(createBirthdayMelody, 1000);
+                }
+            };
+        }
+        
+        // Toggle music on/off
+        function toggleMusic() {
+            isMusicPlaying = !isMusicPlaying;
+            
+            if (isMusicPlaying) {
+                gainNode.gain.value = 0.5;
+                document.getElementById('music-toggle').style.background = 'rgba(255, 92, 162, 0.3)';
+            } else {
+                gainNode.gain.value = 0;
+                document.getElementById('music-toggle').style.background = 'rgba(20, 20, 30, 0.8)';
+            }
+        }
+        
+        // Navigate to next step
+        function nextStep() {
+            if (currentStep >= totalSteps) return;
+            
+            // Animate out current step
+            gsap.to(`#step${currentStep}`, {
+                opacity: 0,
+                y: -30,
+                duration: 0.8,
+                ease: 'power2.in',
+                onComplete: () => {
+                    document.getElementById(`step${currentStep}`).classList.remove('active');
+                    currentStep++;
+                    updateProgressBar();
+                    
+                    // Animate in next step
+                    document.getElementById(`step${currentStep}`).classList.add('active');
+                    
+                    gsap.fromTo(`#step${currentStep}`, 
+                        { opacity: 0, y: 30 },
+                        { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', delay: 0.2 }
+                    );
+                    
+                    // Special animations for specific steps
+                    if (currentStep === 3) {
+                        // Animate bento grid items
+                        gsap.from('.bento-item', {
+                            opacity: 0,
+                            y: 30,
+                            stagger: 0.15,
+                            duration: 0.8,
+                            ease: 'back.out(1.7)',
+                            delay: 0.5
+                        });
+                    } else if (currentStep === 4) {
+                        // Animate polaroid
+                        gsap.from('#polaroid', {
+                            opacity: 0,
+                            scale: 0.5,
+                            rotation: -10,
+                            duration: 1,
+                            ease: 'back.out(1.7)',
+                            delay: 0.5
+                        });
+                    }
+                }
+            });
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            gsap.to('.progress-fill', {
+                width: `${progress}%`,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+        }
+        
+        // Start celebration
+        function startCelebration() {
+            const btn = document.getElementById('celebrate-btn');
+            const finalText = document.getElementById('final-text');
+            
+            // Disable button and fade out
+            btn.disabled = true;
+            gsap.to(btn, {
+                opacity: 0,
+                scale: 0,
+                duration: 0.5,
+                onComplete: () => {
+                    btn.style.display = 'none';
+                }
+            });
+            
+            // Start confetti
+            launchConfetti();
+            
+            // Animate hearts upward
+            hearts.forEach(heart => {
+                gsap.to(heart.position, {
+                    y: heart.position.y + 20,
+                    duration: 3,
+                    ease: 'power2.out'
+                });
+                
+                gsap.to(heart.material, {
+                    opacity: 0,
+                    duration: 3,
+                    ease: 'power2.out'
+                });
+            });
+            
+            // Show final text
+            setTimeout(() => {
+                finalText.textContent = "Happy Birthday, Abu Tayef!";
+                
+                gsap.to(finalText, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1.5,
+                    ease: 'elastic.out(1, 0.5)'
+                });
+                
+                // Add more confetti
+                setTimeout(launchConfetti, 500);
+                setTimeout(launchConfetti, 1000);
+                setTimeout(launchConfetti, 1500);
+            }, 1500);
+        }
+        
+        // Launch confetti
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff5ca2', '#9b59b6', '#3498db', '#f1c40f', '#ffffff'],
+                shapes: ['circle', 'square', 'star'],
+                scalar: 1.2
+            });
+            
+            // Emoji confetti
+            setTimeout(() => {
+                confetti({
+                    particleCount: 30,
+                    spread: 70,
+                    origin: { y: 0.5 },
+                    shapes: ['emoji'],
+                    emojis: ['❤️', '💖', '✨', '🎉', '🎂'],
+                    scalar: 2
+                });
+            }, 200);
+        }
+        
+        // Make functions available globally
+        window.nextStep = nextStep;
+        window.startCelebration = startCelebration;
+    </script>
+</body>
+</html>
